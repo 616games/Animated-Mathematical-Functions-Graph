@@ -64,7 +64,10 @@ public class Graph : MonoBehaviour
         {
             GameObject _point = Instantiate(_pointPrefab, transform, true);
             _points.Add(_point);
+            
+            //To fit within our domain of -1 to 1.
             _position.x = (i + .5f) * _step - 1f;
+            
             _position.y = _function(_position.x, Time.time);
             _point.transform.position = _position;
             _point.transform.localScale = _scale;
