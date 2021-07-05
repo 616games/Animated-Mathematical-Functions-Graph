@@ -57,15 +57,19 @@ public class Graph : MonoBehaviour
     private void Graph2D()
     {
         GraphFunction _function = GraphFunctionLibrary.GetGraphFunction(_graphFunctionType);
+        
+        //Scale is changed to make sure all points fit within our domain of -1 to 1 based on how many points are set for the resolution.
         float _step = 2f / _resolution;
-        Vector3 _position = Vector3.zero;
         Vector3 _scale = Vector3.one * _step;
+        
+        Vector3 _position = Vector3.zero;
         for (int i = 0; i < _resolution; i++)
         {
             GameObject _point = Instantiate(_pointPrefab, transform, true);
             _points.Add(_point);
             
-            //To fit within our domain of -1 to 1.
+            //Position each point side by side starting from the left shifted right .5 units (radius) so they aren't overlapping.
+            //Factor in the point's adjusted scale.
             _position.x = (i + .5f) * _step - 1f;
             
             _position.y = _function(_position.x, Time.time);
@@ -75,7 +79,7 @@ public class Graph : MonoBehaviour
     }
 
     /// <summary>
-    /// Animates the points of the graph.
+    /// Animates the points of the graph based on the currently selected _graphFunctionType.
     /// </summary>
     private void AnimateGraph()
     {
