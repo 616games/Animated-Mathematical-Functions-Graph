@@ -31,9 +31,6 @@ public static class GraphFunctionLibrary
 
             case GraphFunctionType.Ripple:
                 return Ripple;
-            
-            case GraphFunctionType.Ripple2:
-                return Ripple2;
         }
 
         return null;
@@ -41,79 +38,86 @@ public static class GraphFunctionLibrary
 
     /// <summary>
     /// Graphs a line.
+    /// f(x) = x.
     /// </summary>
-    public static float Line(float _xPos, float _zPos, float _time)
+    private static float Line(float _xInput, float _time)
     {
-        return _xPos;
+        return _xInput;
     }
 
     /// <summary>
     /// Graphs a parabola.
+    /// f(x) = x * x.
     /// </summary>
-    public static float Squared(float _xPos, float _zPos, float _time)
+    private static float Squared(float _xInput, float _time)
     {
-        return _xPos * _xPos;
+        return _xInput * _xInput;
     }
 
     /// <summary>
     /// Graphs a cubed function.
+    /// f(x) = x * x * x.
     /// </summary>
-    public static float Cubed(float _xPos, float _zPos, float _time)
+    private static float Cubed(float _xInput, float _time)
     {
-        return _xPos * _xPos * _xPos;
+        return _xInput * _xInput * _xInput;
     }
     
     /// <summary>
-    /// Graphs a sine wave.
+    /// Graphs a single sine wave with its full period of 2PI and animates over time.
+    /// f(x, t) = sin(PI(x + t)). 
     /// </summary>
-    public static float Wave(float _xPos, float _zPos, float _time)
+    private static float Wave(float _xInput, float _time)
     {
-        return Mathf.Sin(Mathf.PI * (_xPos + _zPos + _time));
+        return Mathf.Sin(Mathf.PI * (_xInput + _time));
     }
 
     /// <summary>
-    /// Graphs multiple sine waves together.
+    /// Graphs two sine waves added together with different frequencies and animates over time.
+    /// f1(x, t) = sin(PI(x + t))
+    /// f2(x, t) = .5sin(2PI(x + t))
+    /// divisor = 1.5 (to make sure the result fits within our -1 to 1 domain)
+    /// (f1 + f2) / 1.5 => (f1 + f2) / (3/2) => (2/3)(f1 + f2)
     /// </summary>
-    public static float MultiWave(float _xPos, float _zPos, float _time)
+    private static float MultiWave(float _xInput, float _time)
     {
-        float _y = Mathf.Sin(Mathf.PI * (_xPos + _time));
-        _y += Mathf.Sin(2 * Mathf.PI * (_zPos + _time)) * .5f;
+        float _f1 = Mathf.Sin(Mathf.PI * (_xInput + _time));
+        float _f2 = .5f * Mathf.Sin(2 * Mathf.PI * (_xInput + _time));
 
-        return _y * (2f / 3f);
-    }
-    
-    /// <summary>
-    /// Another example of multiple sine waves graphed together.
-    /// </summary>
-    public static float MultiWave2(float _xPos, float _zPos, float _time)
-    {
-        float _y = Mathf.Sin(Mathf.PI * (_xPos + .5f *_time));
-        _y += Mathf.Sin(2 * Mathf.PI * (_zPos + _time)) * .5f;
-        _y += Mathf.Sin(Mathf.PI * (_xPos + _zPos + .25f + _time)) * .5f;
-
-        return _y * (1f / 2.5f);
-    }
-
-    /// <summary>
-    /// Graphs what looks like a drop of water landing in a body of water using a sine wave.
-    /// </summary>
-    public static float Ripple(float _xPos, float _zPos, float _time)
-    {
-        float _distance = Mathf.Sqrt(_xPos * _xPos + _zPos * _zPos);
-        float _y = Mathf.Sin(Mathf.PI * (4f * _distance - _time));
-
-        return _y / (1f + 10f * _distance);
+        //We multiple the output by 1.5 to make sure it fits within our -1 to 1 domain.
+        return (2f / 3f) * (_f1 + _f2);
     }
     
     /// <summary>
-    /// A more dramatic ripple effect using a sine wave.
+    /// Graphs three sine waves added together with different frequencies and animates over time.
+    /// f1(x, t) = sin(PI(x + .5t))
+    /// f2(x, t) = .5sin(2PI(x + t))
+    /// f3(x, t) = .5sin(PI(x + .25t))
+    /// divisor = 1.5 (to make sure the result fits within our -1 to 1 domain)
+    /// (f1 + f2 + f3) / 1.5 => (f1 + f2 + f3) / (3/2) => (2/3)(f1 + f2 + f3)
     /// </summary>
-    public static float Ripple2(float _xPos, float _zPos, float _time)
+    private static float MultiWave2(float _xInput, float _time)
     {
-        float _abs = Mathf.Abs(_xPos);
-        float _y = Mathf.Sin(Mathf.PI * (4f * _abs - _time));
+        float _f1 = Mathf.Sin(Mathf.PI * (_xInput + .5f *_time));
+        float _f2 = .5f * Mathf.Sin(2 * Mathf.PI * (_xInput + _time));
+        float _f3 = .5f * Mathf.Sin(Mathf.PI * (_xInput + .25f * _time));
 
-        return _y / (1f + 10f * _abs);
+        return (2f / 3f) * (_f1 + _f2 + _f3);
+    }
+
+    /// <summary>
+    /// Graphs a sine wave oscillating away from the center of the graph and decreasing its amplitude over time.
+    /// d = distance from center (absolute value of x input).
+    /// f(x, t) = sin(PI(4d - t))
+    /// divisor = 1 + 10d (to decrease amplitude over time)
+    /// f / (1 + 10d)
+    /// </summary>
+    private static float Ripple(float _xInput, float _time)
+    {
+        float _distance = Mathf.Abs(_xInput);
+        float _f = Mathf.Sin(Mathf.PI * (4f * _distance - _time));
+
+        return _f / (1f + 10f * _distance);
     }
     
     #endregion
